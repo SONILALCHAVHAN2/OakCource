@@ -48,7 +48,7 @@ namespace UI.Areas.Admin.Controllers
                     string UniqueNumber = Guid.NewGuid().ToString();
                     filename = UniqueNumber + postedfile.FileName;
                     resizeImage.Save(Server.MapPath("~/Areas/Admin/Content/UserImage/" + filename));
-              
+
                     model.ImagePath = filename;
                     //model.ImagePath = resizeImage;
                     bll.AddUser(model);
@@ -67,8 +67,62 @@ namespace UI.Areas.Admin.Controllers
             }
             return View(model);
         }
+        public ActionResult UpdateUser(int ID)
+        {
+            UserDTO dto = new UserDTO();
+
+            dto = bll.GetUserWithID(ID);
+            return View(dto);
+        }
+        [HttpPost]
+        public ActionResult UpdateUser(UserDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.ProcessState = General.Message.EmptyArea;
+            }
+            else
+            {
+                //if image is not null its mween image changed and we have to save new image in image folder.
+                if (model.UserImage != null)
+                {
+                    string filename = "";
+                    HttpPostedFileBase postedfile = model.UserImage;
+                    Bitmap UserImage = new Bitmap(postedfile.InputStream);
+                    Bitmap resizeImage = new Bitmap(UserImage, 128, 128);
+                    string ext = Path.GetExtension(postedfile.FileName);
+                    if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif")
+                    {
+                        string UniqueNumber = Guid.NewGuid().ToString();
+                        filename = UniqueNumber + postedfile.FileName;
+                        resizeImage.Save(Server.MapPath("~/Areas/Admin/Content/UserImage/" + filename));
+
+                        model.ImagePath = filename;
+                        
+
+                    }
+                    
+                }
+                // to remember we have to delete the old image From the folder. so we have to define a method for that.
+                
+                string oldImagePath = bll.UpdateUser(model);
+                //we are goimg make a operation only if image has changed.
+                if (model.UserImage != null)
+                {
+                    if (System.IO.File.Exists(Server.MapPath("~/Areas/Admin/Content/UserImage/" + oldImagePath)))
+                    {
+                        System.IO.File.Delete(Server.MapPath("~/Areas/Admin/Content/UserImage/" + oldImagePath));
+                    }
+                    ViewBag.ProcessState = General.Message.UpdateSuccess;
+
+                }
+
+
+            }
+            return View(model);
+
+        }
+
 
     }
-
-
 }

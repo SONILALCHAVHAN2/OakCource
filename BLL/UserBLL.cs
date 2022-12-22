@@ -35,11 +35,23 @@ namespace BLL
             return userdao.GetUsers();
         }
 
+        public UserDTO GetUserWithID(int ID)
+        {
+            return userdao.GetUserWithID(ID);
+        }
+
         public UserDTO GetUserWithUsernameAndPassword(UserDTO model)
         {
             UserDTO dto=new UserDTO();
             dto=userdao.GetUserWithUsernameAndPassword(model);
             return dto;
+        }
+
+        public string UpdateUser(UserDTO model)
+        {
+            string oldImagePath = userdao.UpdateUser(model);
+            LogDAO.AddLog(General.ProcessType.UserUpdated,General.TablesName.User,model.ID);
+            return oldImagePath;
         }
     }
 }

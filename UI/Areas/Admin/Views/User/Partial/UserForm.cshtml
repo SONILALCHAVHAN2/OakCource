@@ -17,6 +17,7 @@
     </div>
     <div class="form-group">
         @Html.LabelFor(x => x.UserImage)
+        <br />
 
         <input type="file" name="UserImage" accept="image/gif,image/jpeg,image/png,image/jpg"
                onchange="$('#UserImage')[0].src = window.URL.createObjectURL(this.files[0])" />
